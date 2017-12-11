@@ -39,4 +39,13 @@ public protocol IBarChartDataSet: IBarLineScatterCandleBubbleChartDataSet
     
     /// array of labels used to describe the different values of the stacked bars
     var stackLabels: [String] { get set }
+    
+    /// set gradient filling of bars
+    var isGradientFill: Bool { get set }
+    
+    /// colors of gradient filling bars
+    var gradientColors: [UIColor] { get set }
+    
+    /// rounded borders of bars
+    var isBarsRounded: Bool { get set }
 }

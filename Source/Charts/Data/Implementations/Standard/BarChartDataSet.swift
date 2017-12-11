@@ -149,6 +149,15 @@ open class BarChartDataSet: BarLineScatterCandleBubbleChartDataSet, IBarChartDat
     /// the alpha value (transparency) that is used for drawing the highlight indicator bar. min = 0.0 (fully transparent), max = 1.0 (fully opaque)
     open var highlightAlpha = CGFloat(120.0 / 255.0)
     
+    /// draw gradient fillig, default = false
+    open var isGradientFill = false
+    
+    /// colors of gradient filling
+    open var gradientColors = [UIColor.green, UIColor.red]
+    
+    /// rounded border of bars default = false
+    open var isBarsRounded = false
+    
     // MARK: - NSCopying
     
     open override func copyWithZone(_ zone: NSZone?) -> AnyObject

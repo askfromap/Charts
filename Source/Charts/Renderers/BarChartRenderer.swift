@@ -289,9 +289,18 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             context.setFillColor(dataSet.color(atIndex: 0).cgColor)
         }
         
+    //
+        var minY = buffer.rects[0].minY
+        for i in 0..<buffer.rects.count {
+            let barRect = buffer.rects[i]
+            if barRect.minY < minY {
+                minY = barRect.minY
+            }
+        }
+        
         for j in stride(from: 0, to: buffer.rects.count, by: 1)
         {
-            let barRect = buffer.rects[j]
+            var barRect = buffer.rects[j]
             
             if (!viewPortHandler.isInBoundsLeft(barRect.origin.x + barRect.size.width))
             {
@@ -303,13 +312,36 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 break
             }
             
-            if !isSingleColor
-            {
-                // Set the color for the currently drawn value. If the index is out of bounds, reuse colors.
-                context.setFillColor(dataSet.color(atIndex: j).cgColor)
+            if dataSet.isBarsRounded {
+                let radius = barRect.width/2 as CGFloat
+                if barRect.height < barRect.width {
+                    barRect = CGRect(x: barRect.minX, y: (barRect.maxY - barRect.width), width: barRect.width, height: barRect.width)
+                }
+                let path = CGPath(roundedRect: barRect, cornerWidth: radius, cornerHeight: radius, transform: nil)
+                
+                context.addPath(path)
             }
             
+            if !dataSet.isGradientFill {
+                if !isSingleColor
+                {
+                    // Set the color for the currently drawn value. If the index is out of bounds, reuse colors.
+                    context.setFillColor(dataSet.color(atIndex: j).cgColor)
+                }
+                
             context.fill(barRect)
+            } else {
+                context.clip()
+                
+                let baseSpace = CGColorSpaceCreateDeviceRGB()
+                let colors = dataSet.gradientColors
+                let gradient = CGGradient(colorsSpace: baseSpace, colors: colors.map{$0.cgColor} as CFArray, locations: nil)
+                let startPoint = CGPoint(x: barRect.minX, y: minY)
+                let endPoint = CGPoint(x: barRect.maxX, y: barRect.maxY)
+                context.drawLinearGradient(gradient!, start: startPoint, end: endPoint, options: CGGradientDrawingOptions())
+                
+                context.resetClip()
+            }
             
             if drawBorder
             {
