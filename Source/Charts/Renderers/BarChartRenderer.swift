@@ -146,12 +146,20 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                     {
                         y = posY
                         yStart = posY + value
-                        posY = yStart
+                        if dataSet.isBarsRounded {
+                            posY = yStart - barWidthHalf*10
+                        } else {
+                            posY = yStart
+                        }
+                        
                     }
                     else
                     {
                         y = negY
                         yStart = negY + abs(value)
+                        if dataSet.isBarsRounded {
+                            negY += abs(value) - barWidthHalf*10
+                        }
                         negY += abs(value)
                     }
                     
@@ -298,7 +306,7 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             }
         }
         
-        for j in stride(from: 0, to: buffer.rects.count, by: 1)
+        for j in stride(from: buffer.rects.count-1, through: 0, by: -1)
         {
             var barRect = buffer.rects[j]
             
@@ -311,7 +319,7 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             {
                 break
             }
-            
+
             if dataSet.isBarsRounded {
                 let radius = barRect.width/2 as CGFloat
                 if barRect.height < barRect.width {
@@ -320,6 +328,8 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 let path = CGPath(roundedRect: barRect, cornerWidth: radius, cornerHeight: radius, transform: nil)
                 
                 context.addPath(path)
+            } else {
+                context.addRect(barRect)
             }
             
             if !dataSet.isGradientFill {
@@ -329,7 +339,8 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                     context.setFillColor(dataSet.color(atIndex: j).cgColor)
                 }
                 
-            context.fill(barRect)
+            context.fillPath()
+                
             } else {
                 context.clip()
                 
