@@ -345,9 +345,14 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                             clockwise: false)
                 path.close()
                 
-                prevX = barRect.origin.x
+                if prevX == barRect.origin.x && barRect.height == barRect.width {
+                    continue
+                }
                 
                 context.addPath(path.cgPath)
+                
+                prevX = barRect.origin.x
+            
             } else {
                 context.addRect(barRect)
             }
