@@ -323,7 +323,7 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 
                 let path = UIBezierPath()
                 path.move(to: CGPoint(x: barRect.origin.x, y: barRect.origin.y + radius))
-                if prevX == barRect.origin.x && barRect.height > barRect.width{
+                if prevX == barRect.origin.x && barRect.height > barRect.width {
                     if needRiseBottom {
                         path.addLine(to: CGPoint(x: barRect.origin.x, y: barRect.maxY - radius))
                         path.addArc(withCenter: CGPoint(x: barRect.origin.x + radius, y: barRect.maxY - radius),
@@ -341,7 +341,7 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                                     clockwise: true)
                     }
                 } else {
-                    if barRect.height == barRect.width {
+                    if barRect.height == barRect.width && prevX != barRect.origin.x {
                         needRiseBottom = true
                     }
                     path.addLine(to: CGPoint(x: barRect.origin.x, y: barRect.maxY - radius))
