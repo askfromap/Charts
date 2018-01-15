@@ -146,20 +146,12 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                     {
                         y = posY
                         yStart = posY + value
-                        if dataSet.isBarsRounded {
-                            posY = yStart - barWidthHalf*10
-                        } else {
-                            posY = yStart
-                        }
-                        
+                        posY = yStart
                     }
                     else
                     {
                         y = negY
                         yStart = negY + abs(value)
-                        if dataSet.isBarsRounded {
-                            negY += abs(value) - barWidthHalf*10
-                        }
                         negY += abs(value)
                     }
                     
@@ -306,7 +298,9 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             }
         }
         
-        for j in stride(from: buffer.rects.count-1, through: 0, by: -1)
+        var prevX : CGFloat?
+        
+        for j in stride(from: 0, to: buffer.rects.count, by: 1)
         {
             var barRect = buffer.rects[j]
             
@@ -325,9 +319,35 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 if barRect.height < barRect.width {
                     barRect = CGRect(x: barRect.minX, y: (barRect.maxY - barRect.width), width: barRect.width, height: barRect.width)
                 }
-                let path = CGPath(roundedRect: barRect, cornerWidth: radius, cornerHeight: radius, transform: nil)
                 
-                context.addPath(path)
+                let path = UIBezierPath()
+                path.move(to: CGPoint(x: barRect.origin.x, y: barRect.origin.y + radius))
+                if prevX == barRect.origin.x {
+                    path.addLine(to: CGPoint(x: barRect.origin.x, y: barRect.maxY + radius))
+                    path.addArc(withCenter: CGPoint(x: barRect.origin.x + radius, y: barRect.maxY + radius),
+                                radius: radius,
+                                startAngle: .pi,
+                                endAngle: 0.0,
+                                clockwise: true)
+                } else {
+                    path.addLine(to: CGPoint(x: barRect.origin.x, y: barRect.maxY - radius))
+                    path.addArc(withCenter: CGPoint(x: barRect.origin.x + radius, y: barRect.maxY - radius),
+                                radius: radius,
+                                startAngle: .pi,
+                                endAngle: 0.0,
+                                clockwise: false)
+                }
+                path.addLine(to: CGPoint(x: barRect.maxX, y: barRect.origin.y + radius))
+                path.addArc(withCenter: CGPoint(x: barRect.origin.x + radius, y: barRect.origin.y + radius),
+                            radius: radius,
+                            startAngle: 0.0,
+                            endAngle: .pi,
+                            clockwise: false)
+                path.close()
+                
+                prevX = barRect.origin.x
+                
+                context.addPath(path.cgPath)
             } else {
                 context.addRect(barRect)
             }
