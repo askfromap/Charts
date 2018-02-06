@@ -327,7 +327,6 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 path.move(to: CGPoint(x: barRect.origin.x, y: barRect.origin.y + radius))
                 if prevX == barRect.origin.x && barRect.height > barRect.width {
                     if needRiseBottom {
-                        print(barRect.maxY)
                         var y: CGFloat?
                         if barRect.maxY > (maxY - radius*2) {
                             y = maxY - radius
