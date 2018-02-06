@@ -298,7 +298,7 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             }
         }
         
-        var prevX : CGFloat?
+        var prevX: CGFloat?
         var needRiseBottom = false
         
         for j in stride(from: 0, to: buffer.rects.count, by: 1)
@@ -314,10 +314,12 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             {
                 break
             }
+            
+            let maxY = buffer.rects[0].maxY
 
             if dataSet.isBarsRounded {
                 let radius = barRect.width/2 as CGFloat
-                if barRect.height < barRect.width {
+                if barRect.height <= barRect.width {
                     barRect = CGRect(x: barRect.minX, y: (barRect.maxY - barRect.width), width: barRect.width, height: barRect.width)
                 }
                 
@@ -325,8 +327,15 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 path.move(to: CGPoint(x: barRect.origin.x, y: barRect.origin.y + radius))
                 if prevX == barRect.origin.x && barRect.height > barRect.width {
                     if needRiseBottom {
-                        path.addLine(to: CGPoint(x: barRect.origin.x, y: barRect.maxY - radius))
-                        path.addArc(withCenter: CGPoint(x: barRect.origin.x + radius, y: barRect.maxY - radius),
+                        print(barRect.maxY)
+                        var y: CGFloat?
+                        if barRect.maxY > (maxY - radius*2) {
+                            y = maxY - radius
+                        } else {
+                            y = barRect.maxY - radius
+                        }
+                        path.addLine(to: CGPoint(x: barRect.origin.x, y: y!))
+                        path.addArc(withCenter: CGPoint(x: barRect.origin.x + radius, y: y!),
                                     radius: radius,
                                     startAngle: .pi,
                                     endAngle: 0.0,
